@@ -1,0 +1,74 @@
+
+
+#Shell
+#python manage.py shell
+
+>>> from news.models import *
+>>> user1 = User.objects.create(username='ry', first_name='ryry')
+>>> Author.objects.create(authorUser=user1)
+<Author: Author object (1)>
+>>> user2 = User.objects.create(username='Oleg', first_name='Bulat')
+>>> Author.objects.create(authorUser=user2)
+<Author: Author object (2)>
+>>> user3 = User.objects.create(username='TEST', first_name='SERVICE')
+>>> Author.objects.create(authorUser=user3)
+<Author: Author object (3)>
+>>> Category.objects.create(name='ARDUINO')
+<Category: Category object (1)>
+>>> Category.objects.create(name='SHIP')
+<Category: Category object (2)>
+>>>
+
+Post.objects.create(author=Author.objects.get(authorUser=User.objects.get(username='Oleg')), categoryType='NW', title='smth title', text='smth text')
+
+p1 = Post.objects.get(pk=1)
+p2 = Post.objects.get(pk=2)
+p3 = Post.objects.get(pk=3)
+c1 = Category.objects.get(name='ARDUINO')
+c2 = Category.objects.get(name='SHIP')
+>>> c3 = Category.objects.get(name='SERVICE')
+p1.postCategory.add(c1)
+p2.postCategory.add(c1, c2)
+p3.postCategory.add(c2)
+
+>>> Comment.objects.create(commentUser=User.objects.get(username='Oleg'), commentPost= Post.objects.get(pk=1), text='comment text1')
+<Comment: Oleg>
+>>> Comment.objects.create(commentUser=User.objects.get(username='ry'), commentPost= Post.objects.get(pk=1), text='comment text1')
+<Comment: ry>
+>>> Comment.objects.create(commentUser=User.objects.get(username='TEST'), commentPost= Post.objects.get(pk=1), text='comment text11')
+<Comment: TEST>
+>>> Comment.objects.create(commentUser=User.objects.get(username='Oleg'), commentPost= Post.objects.get(pk=1), text='comment text11')
+<Comment: Oleg>
+>>> Comment.objects.create(commentUser=User.objects.get(username='Oleg'), commentPost= Post.objects.get(pk=3), text='comment text11')
+<Comment: Oleg>
+>>> Comment.objects.create(commentUser=User.objects.get(username='ry'), commentPost= Post.objects.get(pk=2), text='comment text11')
+<Comment: ry>
+
+>>> Post.objects.get(pk=1).like()
+>>> Post.objects.get(pk=2).like()
+>>> Post.objects.get(pk=3).like()
+>>> Post.objects.get(pk=2).like()
+>>> Post.objects.get(pk=2).like()
+>>> Post.objects.get(pk=2).dislike()
+>>> Post.objects.get(pk=3).dislike()
+>>> Comment.objects.get(pk=1).dislike()
+>>> Comment.objects.get(pk=2).like()
+>>> Comment.objects.get(pk=2).dislike()
+>>> Comment.objects.get(pk=3).dislike()
+>>> Comment.objects.get(pk=3).dislike()
+>>> Comment.objects.get(pk=3).like()
+
+>>> Author.objects.get(authorUser=User.objects.get(username='Oleg')).update_rating()
+
+Author.objects.get(authorUser=User.objects.get(username='Oleg')).ratingAuthor
+
+>>> Author.objects.get(authorUser=User.objects.get(username='ry')).update_rating()
+Traceback (most recent call last):
+  File "<console>", line 1, in <module>
+  File "C:\Users\TEST\PycharmProjects\django-projects\NewsPaper\news\models.py", line 18, in update_rating
+    cRat += commentRat.get ( 'commentRating' )
+TypeError: unsupported operand type(s) for +=: 'int' and 'NoneType'
+>>> best = Author.objects.all().order_by('-ratingAuthor').values('authorUser', 'ratingAuthor')[0]
+>>> print(best)
+{'authorUser': 1, 'ratingAuthor': 0}
+>>>
